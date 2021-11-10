@@ -38,10 +38,14 @@ namespace BarSimulator
             // The bar has N available seats
 
             Bar bar = new Bar();
+            Random random = new Random();
+            NameGenerator nameGen = new NameGenerator(random);
+
             var studentThreads = new List<Thread>();
             for (int i = 0; i < 100; i++)
             {
-                var student = new Student(i.ToString(), bar);
+                var name = nameGen.Next();
+                var student = new Student(name, bar);
                 var thread = new Thread(student.PaintTheTownRed);
 
                 thread.Start();
