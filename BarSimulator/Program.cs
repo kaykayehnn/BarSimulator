@@ -45,7 +45,7 @@ namespace BarSimulator
             for (int i = 0; i < 100; i++)
             {
                 var name = nameGen.Next();
-                var student = new Student(name, bar);
+                var student = new Student(name, bar, random);
                 var thread = new Thread(student.PaintTheTownRed);
 
                 thread.Start();

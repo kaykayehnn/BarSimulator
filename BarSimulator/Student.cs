@@ -5,12 +5,13 @@ namespace BarSimulator
 {
     class Student
     {
-        Random random = new Random();
+        Random random;
 
-        public Student(string name, Bar bar)
+        public Student(string name, Bar bar, Random random)
         {
             this.Name = name;
             this.Bar = bar;
+            this.random = random;
         }
 
         public string Name { get; set; }
