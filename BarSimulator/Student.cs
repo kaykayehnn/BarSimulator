@@ -100,7 +100,9 @@ namespace BarSimulator
 
         private void Drink()
         {
-            Console.WriteLine($"{this} drinks.");
+            var nextDrink = Bar.Drinks[random.Next(Bar.Drinks.Length)];
+
+            Bar.Drink(this, nextDrink);
             Bar.WaitOneTick();
         }
 

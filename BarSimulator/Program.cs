@@ -37,7 +37,12 @@ namespace BarSimulator
             //
             // The bar has N available seats
 
-            Bar bar = new Bar();
+            var drinks = new[] {
+                new Drink("Beer"),
+                new Drink("Vodka"),
+            };
+
+            Bar bar = new Bar(drinks);
             Random random = new Random();
             NameGenerator nameGen = new NameGenerator(random);
 
