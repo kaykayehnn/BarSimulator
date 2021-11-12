@@ -53,8 +53,14 @@ namespace BarSimulator
                 Console.WriteLine($"The bar is out of {drink}s.");
                 return;
             }
+            if (student.Money < drink.Price)
+            {
+                Console.WriteLine($"{student} doesn't have enough money to get a {drink}.");
+                return;
+            }
 
             this.drinkStorage[drink]--;
+            student.Money -= drink.Price;
 
             Console.WriteLine($"{student} drinks a {drink}.");
         }

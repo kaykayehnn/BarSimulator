@@ -6,14 +6,16 @@ namespace BarSimulator
     {
         Random random;
 
-        public Student(string name, Bar bar, Random random)
+        public Student(string name, decimal money, Bar bar, Random random)
         {
             this.Name = name;
+            this.Money = money;
             this.Bar = bar;
             this.random = random;
         }
 
         public string Name { get; set; }
+        public decimal Money { get; set; }
         public Bar Bar { get; set; }
 
         private NightLifeActivity GetRandomNightLifeActivity()

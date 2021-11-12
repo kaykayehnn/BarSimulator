@@ -37,9 +37,11 @@ namespace BarSimulator
             //
             // The bar has N available seats
 
+            const double MAX_MONEY = 10_000;
+
             var drinks = new[] {
-                new Drink("Beer"),
-                new Drink("Vodka"),
+                new Drink("Beer", 5),
+                new Drink("Vodka", 25),
             };
 
             Bar bar = new Bar(drinks);
@@ -50,7 +52,8 @@ namespace BarSimulator
             for (int i = 0; i < 100; i++)
             {
                 var name = nameGen.Next();
-                var student = new Student(name, bar, random);
+                var money = (decimal)(random.NextDouble() * MAX_MONEY);
+                var student = new Student(name, money, bar, random);
                 var thread = new Thread(student.PaintTheTownRed);
 
                 thread.Start();
