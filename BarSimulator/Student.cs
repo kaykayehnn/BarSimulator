@@ -6,16 +6,18 @@ namespace BarSimulator
     {
         Random random;
 
-        public Student(string name, decimal money, Bar bar, Random random)
+        public Student(string name, decimal money, int age, Bar bar, Random random)
         {
             this.Name = name;
             this.Money = money;
+            this.Age = age;
             this.Bar = bar;
             this.random = random;
         }
 
         public string Name { get; set; }
         public decimal Money { get; set; }
+        public int Age { get; set; }
         public Bar Bar { get; set; }
 
         private NightLifeActivity GetRandomNightLifeActivity()
@@ -74,8 +76,11 @@ namespace BarSimulator
         private void VisitBar()
         {
             Console.WriteLine($"{this} is getting in the line to enter the bar.");
-            Bar.Enter(this);
-            Console.WriteLine($"{this} entered the bar.");
+            bool didEnter = Bar.Enter(this);
+            if (!didEnter)
+            {
+                return;
+            }
 
             bool staysAtBar = true;
             while (staysAtBar)

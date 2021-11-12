@@ -38,6 +38,7 @@ namespace BarSimulator
             // The bar has N available seats
 
             const double MAX_MONEY = 10_000;
+            const int MAX_AGE = 100;
 
             var drinks = new[] {
                 new Drink("Beer", 5),
@@ -53,7 +54,8 @@ namespace BarSimulator
             {
                 var name = nameGen.Next();
                 var money = (decimal)(random.NextDouble() * MAX_MONEY);
-                var student = new Student(name, money, bar, random);
+                var age = random.Next(MAX_AGE);
+                var student = new Student(name, money, age, bar, random);
                 var thread = new Thread(student.PaintTheTownRed);
 
                 thread.Start();

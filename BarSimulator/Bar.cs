@@ -10,6 +10,7 @@ namespace BarSimulator
         // one minute.
         public const int TICK_MILLISECONDS = 1;
 
+        public const int MINIMAL_AGE = 18;
         Dictionary<Drink, int> drinkStorage = new Dictionary<Drink, int>();
         List<Student> students = new List<Student>();
         Semaphore semaphore = new Semaphore(10, 10);
@@ -23,13 +24,25 @@ namespace BarSimulator
 
         public Drink[] Drinks { get; }
 
-        public void Enter(Student student)
+        public bool Enter(Student student)
         {
             semaphore.WaitOne();
+            if(student.Age < MINIMAL_AGE)
+            {
+                // Student gets dragged out by the bouncer just before going in.
+                Console.WriteLine($"{student} is not old enough to enter the bar.");
+
+                // Release the handle acquired after waiting in line.
+                semaphore.Release();
+                return false;
+            }
+
             lock (students)
             {
                 students.Add(student);
             }
+
+            return true;
         }
 
         public void Leave(Student student)
