@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 
 namespace BarSimulator
 {
@@ -39,7 +38,7 @@ namespace BarSimulator
         private void WalkOut()
         {
             Console.WriteLine($"{Name} is walking in the streets.");
-            Thread.Sleep(100);
+            Bar.WaitOneTick();
         }
 
         public void PaintTheTownRed()
@@ -102,13 +101,13 @@ namespace BarSimulator
         private void Drink()
         {
             Console.WriteLine($"{Name} drinks.");
-            Thread.Sleep(100);
+            Bar.WaitOneTick();
         }
 
         private void Dance()
         {
             Console.WriteLine($"{Name} dances.");
-            Thread.Sleep(100);
+            Bar.WaitOneTick();
         }
     }
     enum NightLifeActivity
