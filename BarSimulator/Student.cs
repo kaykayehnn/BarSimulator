@@ -37,7 +37,7 @@ namespace BarSimulator
 
         private void WalkOut()
         {
-            Console.WriteLine($"{Name} is walking in the streets.");
+            Console.WriteLine($"{this} is walking in the streets.");
             Bar.WaitOneTick();
         }
 
@@ -56,11 +56,11 @@ namespace BarSimulator
                         break;
                     case NightLifeActivity.VisitBar:
                         VisitBar();
-                        Console.WriteLine($"{Name} is going back home.");
+                        Console.WriteLine($"{this} is going back home.");
                         staysOut = false;
                         break;
                     case NightLifeActivity.GoHome:
-                        Console.WriteLine($"{Name} is going back home.");
+                        Console.WriteLine($"{this} is going back home.");
                         staysOut = false;
                         break;
                     default:
@@ -71,9 +71,9 @@ namespace BarSimulator
 
         private void VisitBar()
         {
-            Console.WriteLine($"{Name} is getting in the line to enter the bar.");
+            Console.WriteLine($"{this} is getting in the line to enter the bar.");
             Bar.Enter(this);
-            Console.WriteLine($"{Name} entered the bar.");
+            Console.WriteLine($"{this} entered the bar.");
 
             bool staysAtBar = true;
             while (staysAtBar)
@@ -89,7 +89,7 @@ namespace BarSimulator
                         break;
                     case BarActivity.Leave:
                         Bar.Leave(this);
-                        Console.WriteLine($"{Name} is leaving the bar.");
+                        Console.WriteLine($"{this} is leaving the bar.");
                         staysAtBar = false;
                         break;
                     default:
@@ -100,14 +100,19 @@ namespace BarSimulator
 
         private void Drink()
         {
-            Console.WriteLine($"{Name} drinks.");
+            Console.WriteLine($"{this} drinks.");
             Bar.WaitOneTick();
         }
 
         private void Dance()
         {
-            Console.WriteLine($"{Name} dances.");
+            Console.WriteLine($"{this} dances.");
             Bar.WaitOneTick();
+        }
+
+        public override string ToString()
+        {
+            return this.Name;
         }
     }
     enum NightLifeActivity
