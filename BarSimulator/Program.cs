@@ -78,6 +78,10 @@ namespace BarSimulator
             barThread.Join();
 
             Console.WriteLine();
+            
+            var report = bar.GenerateDrinkReport();
+            Console.WriteLine(report);
+
             Console.WriteLine("The party is over.");
         }
     }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Linq;
+using System.Text;
 
 namespace BarSimulator
 {
@@ -18,6 +20,7 @@ namespace BarSimulator
         BarState barState;
         DateTime time;
         Dictionary<Drink, int> drinkStorage = new Dictionary<Drink, int>();
+        Dictionary<Drink, int> drinkSales = new Dictionary<Drink, int>();
         List<Student> students = new List<Student>();
         Semaphore semaphore = new Semaphore(10, 10);
         Random random;
@@ -111,6 +114,8 @@ namespace BarSimulator
             }
 
             this.drinkStorage[drink]--;
+            this.drinkSales[drink]++;
+
             student.Money -= drink.Price;
 
             Console.WriteLine($"{student} drinks a {drink}.");
@@ -155,12 +160,41 @@ namespace BarSimulator
             this.barState = BarState.Closed;
         }
 
+        public string GenerateDrinkReport()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Drink sales:");
+            foreach (var kvp in drinkSales)
+            {
+                sb.AppendLine($"{kvp.Key}: {kvp.Value} units sold");
+            }
+
+            sb.AppendLine();
+            sb.AppendLine("Units out of stock:");
+            var outOfStock = drinkStorage.Where(kvp => kvp.Value == 0);
+
+            if (!outOfStock.Any())
+            {
+                sb.AppendLine("None");
+            }
+            else
+            {
+                foreach (var kvp in outOfStock)
+                {
+                    sb.AppendLine(kvp.Key.ToString());
+                }
+            }
+
+            return sb.ToString();
+        }
+
         private void LoadDrinks()
         {
             // Load 10000 units of each available drink type.
             foreach (var drink in this.Drinks)
             {
                 this.drinkStorage[drink] = 10000;
+                this.drinkSales[drink] = 0;
             }
         }
 
