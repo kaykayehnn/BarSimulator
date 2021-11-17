@@ -45,8 +45,8 @@ namespace BarSimulator
                 new Drink("Vodka", 25),
             };
 
-            Bar bar = new Bar(drinks);
             Random random = new Random();
+            Bar bar = new Bar(drinks, random);
             NameGenerator nameGen = new NameGenerator(random);
 
             var studentThreads = new List<Thread>();

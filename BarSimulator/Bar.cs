@@ -14,10 +14,12 @@ namespace BarSimulator
         Dictionary<Drink, int> drinkStorage = new Dictionary<Drink, int>();
         List<Student> students = new List<Student>();
         Semaphore semaphore = new Semaphore(10, 10);
+        Random random;
 
-        public Bar(Drink[] drinks)
+        public Bar(Drink[] drinks, Random random)
         {
             this.Drinks = drinks;
+            this.random = random;
 
             this.LoadDrinks();
         }
@@ -26,7 +28,16 @@ namespace BarSimulator
 
         public bool Enter(Student student)
         {
-            semaphore.WaitOne();
+            int waitCounter = 0;
+            while (!semaphore.WaitOne(TICK_MILLISECONDS))
+            {
+                waitCounter++;
+                if (WillPersonLeaveQueue(waitCounter))
+                {
+                    return false;
+                }
+            }
+
             if(student.Age < MINIMAL_AGE)
             {
                 // Student gets dragged out by the bouncer just before going in.
@@ -85,6 +96,15 @@ namespace BarSimulator
             {
                 this.drinkStorage[drink] = 10000;
             }
+        }
+
+        private bool WillPersonLeaveQueue(int waitCounter)
+        {
+            var leaveChance = random.NextDouble();
+            // We use a logarithmic function here to simulate real-world
+            // patience. For a graph of the function see
+            // https://www.desmos.com/calculator/vaci9h8qpl
+            return leaveChance <= Math.Log(waitCounter, 2) / 10;
         }
     }
 }
