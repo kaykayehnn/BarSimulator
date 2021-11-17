@@ -75,32 +75,52 @@ namespace BarSimulator
 
         private void VisitBar()
         {
-            Console.WriteLine($"{this} is getting in the line to enter the bar.");
-            bool didEnter = Bar.Enter(this);
-            if (!didEnter)
+            // First set this flag to true, in case we never enter the bar.
+            bool hasLeftBar = true;
+            try
             {
-                return;
-            }
-
-            bool staysAtBar = true;
-            while (staysAtBar)
-            {
-                var nextActivity = GetRandomBarActivity();
-                switch (nextActivity)
+                Console.WriteLine($"{this} is getting in the line to enter the bar.");
+                bool didEnter = Bar.Enter(this);
+                if (!didEnter)
                 {
-                    case BarActivity.Drink:
-                        Drink();
-                        break;
-                    case BarActivity.Dance:
-                        Dance();
-                        break;
-                    case BarActivity.Leave:
-                        Bar.Leave(this);
-                        Console.WriteLine($"{this} is leaving the bar.");
-                        staysAtBar = false;
-                        break;
-                    default:
-                        throw new Exception($"Unexpected bar activity {nextActivity}");
+                    // We got tired of waiting or were not allowed to enter the bar.
+                    return;
+                }
+
+                // After we have entered the bar, set it to false.
+                hasLeftBar = false;
+                Console.WriteLine($"{this} entered the bar.");
+
+                while (!hasLeftBar)
+                {
+                    var nextActivity = GetRandomBarActivity();
+                    switch (nextActivity)
+                    {
+                        case BarActivity.Drink:
+                            Drink();
+                            break;
+                        case BarActivity.Dance:
+                            Dance();
+                            break;
+                        case BarActivity.Leave:
+                            Bar.Leave(this);
+                            Console.WriteLine($"{this} is leaving the bar.");
+                            hasLeftBar = true;
+                            break;
+                        default:
+                            throw new Exception($"Unexpected bar activity {nextActivity}");
+                    }
+                }
+            }
+            catch (BarClosedException)
+            {
+                Console.WriteLine($"The bar closed before {this} could finish partying. Boo!");
+            }
+            finally
+            {
+                if (!hasLeftBar)
+                {
+                    Bar.Leave(this);
                 }
             }
         }
@@ -115,7 +135,7 @@ namespace BarSimulator
 
         private void Dance()
         {
-            Console.WriteLine($"{this} dances.");
+            Bar.Dance(this);
             Bar.WaitOneTick();
         }
 

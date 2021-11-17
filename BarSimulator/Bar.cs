@@ -11,6 +11,12 @@ namespace BarSimulator
         public const int TICK_MILLISECONDS = 1;
 
         public const int MINIMAL_AGE = 18;
+        // The bar opens at 22:00 and closes at 5:00
+        private const int OPENS_HOURS = 22;
+        private const int CLOSES_HOURS = 5;
+
+        BarState barState;
+        DateTime time;
         Dictionary<Drink, int> drinkStorage = new Dictionary<Drink, int>();
         List<Student> students = new List<Student>();
         Semaphore semaphore = new Semaphore(10, 10);
@@ -18,6 +24,7 @@ namespace BarSimulator
 
         public Bar(Drink[] drinks, Random random)
         {
+            this.barState = BarState.NotOpenYet;
             this.Drinks = drinks;
             this.random = random;
 
@@ -48,12 +55,31 @@ namespace BarSimulator
                 return false;
             }
 
-            lock (students)
+            while (true)
             {
-                students.Add(student);
+                switch (this.barState)
+                {
+                    case BarState.NotOpenYet:
+                        Console.WriteLine("The bar has not opened yet. Waiting to open...");
+                        while (this.barState == BarState.NotOpenYet)
+                        {
+                            WaitOneTick();
+                        }
+                        break;
+                    case BarState.Open:
+                        lock (students)
+                        {
+                            students.Add(student);
+                        }
+                        return true;
+                    case BarState.Closed:
+                        // Release the handle acquired after waiting in line.
+                        semaphore.Release();
+                        throw new BarClosedException();
+                    default:
+                        throw new Exception($"Unexpected BarState: {barState}");
+                }
             }
-
-            return true;
         }
 
         public void Leave(Student student)
@@ -72,6 +98,7 @@ namespace BarSimulator
 
         public void Drink(Student student, Drink drink)
         {
+            CheckIfBarIsOpen();
             if (this.drinkStorage[drink] <= 0)
             {
                 Console.WriteLine($"The bar is out of {drink}s.");
@@ -87,6 +114,45 @@ namespace BarSimulator
             student.Money -= drink.Price;
 
             Console.WriteLine($"{student} drinks a {drink}.");
+        }
+
+        public void Dance(Student student)
+        {
+            CheckIfBarIsOpen();
+
+            Console.WriteLine($"{student} dances.");
+        }
+
+        public void OpenBar()
+        {
+            this.barState = BarState.Open;
+
+            var now = DateTime.Now;
+            this.time = new DateTime(now.Year, now.Month, now.Day, OPENS_HOURS, 0, 0);
+
+            int openForHowManyHours;
+            if (OPENS_HOURS > CLOSES_HOURS)
+            {
+                // Closes on the next day
+                openForHowManyHours = 24 - OPENS_HOURS + CLOSES_HOURS;
+            }
+            else if (OPENS_HOURS < CLOSES_HOURS)
+            {
+                openForHowManyHours = CLOSES_HOURS - OPENS_HOURS;
+            }
+            else
+            {
+                throw new InvalidOperationException("The bar never closes. This is not allowed");
+            }
+
+            var closeTime = this.time.AddHours(openForHowManyHours);
+            while (this.time < closeTime)
+            {
+                this.time = this.time.AddMinutes(1);
+                WaitOneTick();
+            }
+
+            this.barState = BarState.Closed;
         }
 
         private void LoadDrinks()
@@ -106,5 +172,21 @@ namespace BarSimulator
             // https://www.desmos.com/calculator/vaci9h8qpl
             return leaveChance <= Math.Log(waitCounter, 2) / 10;
         }
+
+        private void CheckIfBarIsOpen()
+        {
+            if (this.barState == BarState.Closed)
+            {
+                throw new BarClosedException();
+            }
+        }
     }
+
+    public enum BarState
+    {
+        NotOpenYet, Open, Closed
+    }
+
+    public class BarClosedException : Exception
+    { }
 }

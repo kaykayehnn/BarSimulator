@@ -50,7 +50,7 @@ namespace BarSimulator
             NameGenerator nameGen = new NameGenerator(random);
 
             var studentThreads = new List<Thread>();
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 5000; i++)
             {
                 var name = nameGen.Next();
                 var money = (decimal)(random.NextDouble() * MAX_MONEY);
@@ -58,15 +58,24 @@ namespace BarSimulator
                 var student = new Student(name, money, age, bar, random);
                 var thread = new Thread(student.PaintTheTownRed);
 
-                thread.Start();
-
                 studentThreads.Add(thread);
+            }
+
+            // Open the bar
+            Thread barThread = new Thread(bar.OpenBar);
+            barThread.Start();
+
+            // And let all students go wild
+            foreach (var t in studentThreads)
+            {
+                t.Start();
             }
 
             foreach (var t in studentThreads)
             {
                 t.Join();
             }
+            barThread.Join();
 
             Console.WriteLine();
             Console.WriteLine("The party is over.");
